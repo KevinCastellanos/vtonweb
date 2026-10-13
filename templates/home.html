@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero text-center fade-up">
+ <h1 class="display-5 fw-bold">Pruébate la ropa sin probártela</h1>
+ <p class="lead mx-auto" style="max-width:640px;color:#c9d8f0">Sube tu foto de cuerpo completo y la de una prenda. Nuestra IA, corriendo en una GPU de nuestra propia nube, te muestra cómo te queda.</p>
+ <a class="btn btn-light btn-lg mt-3 me-2" href="{% url 'register' %}">Crear cuenta gratis</a>
+ <a class="btn btn-outline-light btn-lg mt-3" href="{% url 'login' %}">Ya tengo cuenta</a>
+</section>
+<div class="row g-4 mt-2">
+ <div class="col-md-4 fade-up d1"><div class="card h-100 p-4"><i class="bi bi-cloud-arrow-up fs-1 text-primary"></i><h5 class="mt-2">1. Sube dos fotos</h5><p class="text-muted mb-0">Una de cuerpo completo y una de la prenda sobre fondo plano.</p></div></div>
+ <div class="col-md-4 fade-up d2"><div class="card h-100 p-4"><i class="bi bi-hourglass-split fs-1 text-primary"></i><h5 class="mt-2">2. Entra a la cola</h5><p class="text-muted mb-0">La IA atiende una solicitud a la vez; ves tu posición en tiempo real.</p></div></div>
+ <div class="col-md-4 fade-up d3"><div class="card h-100 p-4"><i class="bi bi-stars fs-1 text-primary"></i><h5 class="mt-2">3. Mira el resultado</h5><p class="text-muted mb-0">Se guarda en tu historial para que lo revises cuando quieras.</p></div></div>
+</div>
+{% endblock %}

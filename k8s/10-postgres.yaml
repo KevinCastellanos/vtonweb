@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: postgres, namespace: vton-web, labels: {app: postgres}}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: postgres}}
+  template:
+    metadata: {labels: {app: postgres}}
+    spec:
+      nodeSelector: {vton-web: "true"}
+      securityContext: {seLinuxOptions: {type: spc_t}}
+      containers:
+      - name: postgres
+        image: docker.io/library/postgres:16-alpine
+        imagePullPolicy: IfNotPresent
+        ports: [{containerPort: 5432}]
+        env:
+        - {name: PGDATA, value: /var/lib/postgresql/data/pgdata}
+        - {name: POSTGRES_DB, valueFrom: {configMapKeyRef: {name: vtonweb-config, key: POSTGRES_DB}}}
+        - {name: POSTGRES_USER, valueFrom: {configMapKeyRef: {name: vtonweb-config, key: POSTGRES_USER}}}
+        - {name: POSTGRES_PASSWORD, valueFrom: {secretKeyRef: {name: vtonweb, key: POSTGRES_PASSWORD}}}
+        resources: {requests: {cpu: 100m, memory: 128Mi}, limits: {memory: 512Mi}}
+        readinessProbe: {exec: {command: ["pg_isready", "-U", "vtonweb"]}, periodSeconds: 5}
+        volumeMounts: [{name: pgdata, mountPath: /var/lib/postgresql/data}]
+      volumes:
+      - name: pgdata
+        hostPath: {path: /var/lib/docker/vtonweb-pg, type: DirectoryOrCreate}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: postgres, namespace: vton-web}
+spec:
+  selector: {app: postgres}
+  ports: [{port: 5432, targetPort: 5432}]

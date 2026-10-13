@@ -1,0 +1,49 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}VTON Studio{% endblock %}</title>
+<link href="{% static 'vendor/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'vendor/bootstrap-icons.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/app.css' %}" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark navbar-navy sticky-top">
+ <div class="container">
+  <a class="navbar-brand fw-semibold" href="{% url 'home' %}"><span class="brand-dot"></span>VTON Studio</a>
+  <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nv"><span class="navbar-toggler-icon"></span></button>
+  <div id="nv" class="collapse navbar-collapse">
+   <ul class="navbar-nav me-auto">
+    {% if user.is_authenticated %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'studio' %}"><i class="bi bi-magic"></i> Probador</a></li>
+    <li class="nav-item"><a class="nav-link" href="{% url 'history' %}"><i class="bi bi-clock-history"></i> Historial</a></li>
+    {% endif %}
+   </ul>
+   <ul class="navbar-nav align-items-lg-center">
+    {% if user.is_authenticated %}
+     {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="/admin/"><i class="bi bi-speedometer2"></i> Administración</a></li>{% endif %}
+     <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i> {{ user.get_short_name|default:user.username }}</a>
+      <ul class="dropdown-menu dropdown-menu-end">
+       <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person-gear"></i> Mi perfil</a></li>
+       <li><a class="dropdown-item" href="{% url 'password_change' %}"><i class="bi bi-key"></i> Cambiar contraseña</a></li>
+       <li><hr class="dropdown-divider"></li>
+       <li><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Salir</button></form></li>
+      </ul>
+     </li>
+    {% else %}
+     <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Entrar</a></li>
+     <li class="nav-item"><a class="btn btn-sm btn-light ms-lg-2" href="{% url 'register' %}">Crear cuenta</a></li>
+    {% endif %}
+   </ul>
+  </div>
+ </div>
+</nav>
+<main class="container py-4">
+ {% for m in messages %}<div class="alert alert-{{ m.tags|default:'info' }} alert-dismissible fade show fade-up">{{ m }}<button class="btn-close" data-bs-dismiss="alert"></button></div>{% endfor %}
+ {% block content %}{% endblock %}
+</main>
+<footer class="text-center py-4 small">VTON Studio · Plataforma SaaS sobre OpenStack + Kubernetes (Magnum)</footer>
+<script src="{% static 'vendor/bootstrap.bundle.min.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body></html>

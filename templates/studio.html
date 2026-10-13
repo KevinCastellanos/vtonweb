@@ -1,0 +1,20 @@
+{% extends 'base.html' %}{% block title %}Probador · VTON Studio{% endblock %}
+{% block content %}
+<div class="fade-up mb-3"><h2 class="fw-bold">Probador virtual</h2>
+<p class="text-muted">Usa una foto de <b>cuerpo completo</b> y una prenda <b>sobre fondo plano</b> para mejores resultados. Máx. {{ max_mb }} MB por imagen.</p></div>
+<form id="tf" enctype="multipart/form-data" class="fade-up d1">{% csrf_token %}
+<div class="row g-4">
+ <div class="col-md-6"><div class="dropzone" data-name="person"><div class="hint"><i class="bi bi-person-bounding-box"></i><h5 class="mt-2">Foto de la persona</h5><div class="text-muted">Arrastra aquí o haz clic</div></div>
+  <img class="preview" alt=""><span class="badge text-bg-success badge-ok"><i class="bi bi-check2"></i> Lista</span><input type="file" name="person" accept="image/*"></div></div>
+ <div class="col-md-6"><div class="dropzone" data-name="garment"><div class="hint"><i class="bi bi-handbag"></i><h5 class="mt-2">Foto de la prenda</h5><div class="text-muted">Arrastra aquí o haz clic</div></div>
+  <img class="preview" alt=""><span class="badge text-bg-success badge-ok"><i class="bi bi-check2"></i> Lista</span><input type="file" name="garment" accept="image/*"></div></div>
+</div>
+<div class="card mt-4"><div class="card-body row g-3 align-items-end">
+ <div class="col-md-4"><label class="form-label fw-medium">Tipo de prenda</label>{{ form.category }}</div>
+ <div class="col-md-5"><label class="form-label fw-medium">Foto de la prenda</label>{{ form.garment_photo_type }}</div>
+ <div class="col-md-3 d-grid"><button id="go" class="btn btn-primary btn-lg" disabled><i class="bi bi-magic"></i> Probar</button></div>
+</div></div>
+<div id="err" class="alert alert-danger mt-3 d-none"></div>
+</form>
+{% endblock %}
+{% block scripts %}{% load static %}<script src="{% static 'js/studio.js' %}"></script>{% endblock %}

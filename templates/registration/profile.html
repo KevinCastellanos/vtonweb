@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block title %}Mi perfil · VTON Studio{% endblock %}
+{% block content %}
+<div class="card auth-card fade-up"><div class="card-header-navy p-3"><h5 class="mb-0"><i class="bi bi-person-gear"></i> Mi perfil</h5></div>
+<div class="card-body p-4"><form method="post">{% csrf_token %}{% include 'registration/_form.html' %}
+<button class="btn btn-primary">Guardar cambios</button>
+<a class="btn btn-outline-primary ms-2" href="{% url 'password_change' %}"><i class="bi bi-key"></i> Cambiar contraseña</a></form>
+<hr><p class="small text-muted mb-0">Miembro desde {{ user.date_joined|date:"d/m/Y" }}.</p></div></div>
+{% endblock %}

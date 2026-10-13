@@ -1,0 +1,44 @@
+:root{--navy-900:#081529;--navy-800:#0b1f3a;--navy-700:#12315c;--navy-600:#1b447f;--accent:#4f8cff;--accent-2:#7fb0ff;--ink:#0e1b2e;--soft:#eef3fb}
+body{background:linear-gradient(180deg,#f4f7fc 0%,#e9eff9 100%);min-height:100vh;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.navbar-navy{background:linear-gradient(90deg,var(--navy-900),var(--navy-700));box-shadow:0 2px 14px rgba(8,21,41,.35)}
+.navbar-navy .nav-link{color:#c9d8f0;border-radius:.5rem;transition:all .2s}
+.navbar-navy .nav-link:hover,.navbar-navy .nav-link.active{color:#fff;background:rgba(255,255,255,.1)}
+.brand-dot{display:inline-block;width:.7rem;height:.7rem;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);margin-right:.5rem}
+.btn-primary{--bs-btn-bg:var(--navy-700);--bs-btn-border-color:var(--navy-700);--bs-btn-hover-bg:var(--navy-600);--bs-btn-hover-border-color:var(--navy-600);--bs-btn-active-bg:var(--navy-800);--bs-btn-active-border-color:var(--navy-800);--bs-btn-disabled-bg:var(--navy-700);transition:transform .15s,box-shadow .15s}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(18,49,92,.35)}
+.btn-outline-primary{--bs-btn-color:var(--navy-700);--bs-btn-border-color:var(--navy-700);--bs-btn-hover-bg:var(--navy-700);--bs-btn-hover-border-color:var(--navy-700)}
+a{color:var(--navy-600)}
+.card{border:0;border-radius:1rem;box-shadow:0 6px 24px rgba(11,31,58,.08)}
+.card-header-navy{background:linear-gradient(90deg,var(--navy-800),var(--navy-700));color:#fff;border-radius:1rem 1rem 0 0!important}
+.hero{background:radial-gradient(circle at 20% 20%,var(--navy-600),var(--navy-900));color:#fff;border-radius:1.5rem;padding:4rem 2rem;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;background:rgba(79,140,255,.18);animation:float 8s ease-in-out infinite}
+@keyframes float{50%{transform:translate(-30px,30px)}}
+.fade-up{opacity:0;transform:translateY(16px);animation:fadeUp .6s ease forwards}
+.fade-up.d1{animation-delay:.1s}.fade-up.d2{animation-delay:.2s}.fade-up.d3{animation-delay:.3s}
+@keyframes fadeUp{to{opacity:1;transform:none}}
+/* zonas de subida */
+.dropzone{position:relative;border:2px dashed #aebfdc;border-radius:1rem;background:#fff;min-height:300px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;overflow:hidden;transition:border-color .25s,background .25s,transform .25s}
+.dropzone:hover,.dropzone.drag{border-color:var(--accent);background:#f3f8ff;transform:translateY(-3px)}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.dropzone .hint i{font-size:2.6rem;color:var(--navy-600)}
+.dropzone img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;opacity:0;transform:scale(.94);transition:opacity .5s,transform .5s}
+.dropzone.has-img{border-style:solid;border-color:var(--accent)}
+.dropzone.has-img img.preview{opacity:1;transform:none}
+.dropzone .badge-ok{position:absolute;top:.6rem;right:.6rem;opacity:0;transition:opacity .4s .2s}
+.dropzone.has-img .badge-ok{opacity:1}
+/* proceso */
+.steps{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-radius:2rem;background:var(--soft);color:#6a7d9c;transition:all .4s}
+.step.active{background:var(--navy-700);color:#fff;animation:pulse 1.6s infinite}
+.step.done{background:#dff5e8;color:#1c7a45}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(79,140,255,.18)}}
+.progress{height:.7rem;border-radius:1rem;background:#dce6f7}
+.progress-bar{background:linear-gradient(90deg,var(--navy-600),var(--accent));transition:width .8s ease}
+.result-wrap img{border-radius:1rem;max-width:100%}
+.reveal{filter:blur(18px);transform:scale(1.03);transition:filter 1.4s ease,transform 1.4s ease}
+.reveal.show{filter:none;transform:none}
+.thumb{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:.75rem}
+.hist-card{transition:transform .2s,box-shadow .2s}.hist-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(11,31,58,.16)}
+.auth-card{max-width:440px;margin:3rem auto}
+.form-control:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 .25rem rgba(79,140,255,.2)}
+footer{color:#6a7d9c}

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: web, namespace: vton-web, labels: {app: web}}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: web}}
+  template:
+    metadata: {labels: {app: web}}
+    spec:
+      nodeSelector: {vton-web: "true"}
+      securityContext: {seLinuxOptions: {type: spc_t}}
+      initContainers:
+      - name: fix-perms          # el hostPath nace como root; la app corre como uid 10001
+        image: localhost/vtonweb:1.0
+        imagePullPolicy: Never
+        command: ["sh", "-c", "mkdir -p /data/media && chown -R 10001 /data/media"]
+        securityContext: {runAsUser: 0}
+        volumeMounts: [{name: media, mountPath: /data/media}]
+      containers:
+      - name: web
+        image: localhost/vtonweb:1.0
+        imagePullPolicy: Never
+        args: ["web"]
+        ports: [{containerPort: 8000}]
+        envFrom:
+        - configMapRef: {name: vtonweb-config}
+        - secretRef: {name: vtonweb}
+        resources: {requests: {cpu: 100m, memory: 256Mi}, limits: {memory: 768Mi}}
+        readinessProbe: {httpGet: {path: /healthz, port: 8000}, periodSeconds: 10, timeoutSeconds: 5, initialDelaySeconds: 10}
+        livenessProbe: {httpGet: {path: /healthz, port: 8000}, periodSeconds: 20, timeoutSeconds: 5, initialDelaySeconds: 40}
+        volumeMounts: [{name: media, mountPath: /data/media}]
+      volumes:
+      - name: media
+        hostPath: {path: /var/lib/docker/vtonweb-media, type: DirectoryOrCreate}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: web, namespace: vton-web}
+spec:
+  type: NodePort
+  selector: {app: web}
+  ports: [{port: 8000, targetPort: 8000, nodePort: 30900}]

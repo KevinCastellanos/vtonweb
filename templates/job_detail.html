@@ -1,0 +1,54 @@
+{% extends 'base.html' %}{% block title %}Solicitud #{{ job.pk }} · VTON Studio{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center fade-up mb-3">
+ <h2 class="fw-bold mb-0">Solicitud #{{ job.pk }}</h2><a class="btn btn-outline-primary" href="{% url 'studio' %}"><i class="bi bi-plus-lg"></i> Nueva prueba</a></div>
+<div id="progressCard" class="card p-4 fade-up d1">
+ <div class="steps mb-3">
+  <div class="step" id="s1"><i class="bi bi-cloud-check"></i> Recibida</div>
+  <div class="step" id="s2"><i class="bi bi-hourglass-split"></i> En cola</div>
+  <div class="step" id="s3"><i class="bi bi-cpu"></i> Procesando con IA</div>
+  <div class="step" id="s4"><i class="bi bi-stars"></i> Listo</div>
+ </div>
+ <div class="progress"><div id="bar" class="progress-bar" style="width:5%"></div></div>
+ <p id="msg" class="text-center text-muted mt-3 mb-0">Conectando…</p>
+</div>
+<div id="errBox" class="alert alert-danger d-none mt-3"></div>
+<div class="row g-4 mt-1">
+ <div class="col-md-4 fade-up d2"><div class="card p-3 text-center"><small class="text-muted mb-2">Persona</small><img class="thumb" src="{% url 'job_media' job.pk 'person' %}" alt=""></div></div>
+ <div class="col-md-4 fade-up d2"><div class="card p-3 text-center"><small class="text-muted mb-2">Prenda</small><img class="thumb" src="{% url 'job_media' job.pk 'garment' %}" alt=""></div></div>
+ <div class="col-md-4 fade-up d3"><div class="card p-3 text-center result-wrap"><small class="text-muted mb-2">Resultado</small>
+  <div id="resBox" class="d-flex align-items-center justify-content-center" style="min-height:260px"><span class="text-muted"><i class="bi bi-image fs-1"></i></span></div>
+  <a id="dl" class="btn btn-primary mt-3 d-none" download="tryon-{{ job.pk }}.png"><i class="bi bi-download"></i> Descargar</a></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const URL_STATUS = "{% url 'job_status' job.pk %}";
+const $ = id => document.getElementById(id);
+function steps(n){ ['s1','s2','s3','s4'].forEach((id,i)=>{ $(id).className='step'+(i<n?' done':(i===n?' active':'')); }); }
+let timer;
+async function tick(){
+  try{
+    const j = await (await fetch(URL_STATUS)).json();
+    if(j.status==='queued'){
+      steps(1); $('bar').style.width='25%';
+      $('msg').textContent = j.position>0 ? `Tu posición en la cola: ${j.position}. Espera estimada ≈ ${j.eta} s.` : 'Eres el siguiente…';
+      if(j.error) $('msg').textContent += ' ('+j.error+')';
+    } else if(j.status==='processing'){
+      steps(2); $('bar').style.width='65%'; $('msg').textContent=`La IA está generando tu imagen (≈ ${Math.round(j.avg)} s)…`;
+    } else if(j.status==='done'){
+      steps(4); $('bar').style.width='100%'; $('msg').textContent=`¡Listo! La IA tardó ${Math.round(j.api_seconds||0)} s.`;
+      const img=new Image(); img.className='reveal'; img.style.maxWidth='100%'; img.style.borderRadius='1rem';
+      img.onload=()=>{ $('resBox').innerHTML=''; $('resBox').appendChild(img); requestAnimationFrame(()=>requestAnimationFrame(()=>img.classList.add('show'))); };
+      img.src=j.result; $('dl').href=j.result; $('dl').classList.remove('d-none');
+      clearInterval(timer); return;
+    } else if(j.status==='error'){
+      steps(0); $('bar').style.width='100%'; $('bar').classList.add('bg-danger');
+      $('msg').textContent='No se pudo completar.'; $('errBox').textContent=j.error; $('errBox').classList.remove('d-none');
+      clearInterval(timer); return;
+    }
+  }catch(e){ $('msg').textContent='Reconectando…'; }
+}
+steps(0); tick(); timer=setInterval(tick,2000);
+</script>
+{% endblock %}

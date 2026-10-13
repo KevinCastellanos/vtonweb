@@ -1,0 +1,22 @@
+# Prueba local (sin Kubernetes): docker compose up --build   -> http://localhost:8080
+services:
+  db:
+    image: postgres:16-alpine
+    environment: {POSTGRES_DB: vtonweb, POSTGRES_USER: vtonweb, POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-vtonweb}"}
+    volumes: [pgdata:/var/lib/postgresql/data]
+  web:
+    build: .
+    command: web
+    env_file: .env
+    environment: {POSTGRES_HOST: db, MEDIA_ROOT: /data/media}
+    ports: ["8080:8000"]
+    volumes: [media:/data/media]
+    depends_on: [db]
+  worker:
+    build: .
+    command: worker
+    env_file: .env
+    environment: {POSTGRES_HOST: db, MEDIA_ROOT: /data/media}
+    volumes: [media:/data/media]
+    depends_on: [db]
+volumes: {pgdata: {}, media: {}}

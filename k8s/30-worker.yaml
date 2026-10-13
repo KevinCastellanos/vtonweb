@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: worker, namespace: vton-web, labels: {app: worker}}
+spec:
+  replicas: 1          # un solo worker: la API de IA atiende una petición a la vez
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: worker}}
+  template:
+    metadata: {labels: {app: worker}}
+    spec:
+      nodeSelector: {vton-web: "true"}
+      securityContext: {seLinuxOptions: {type: spc_t}}
+      containers:
+      - name: worker
+        image: localhost/vtonweb:1.0
+        imagePullPolicy: Never
+        args: ["worker"]
+        envFrom:
+        - configMapRef: {name: vtonweb-config}
+        - secretRef: {name: vtonweb}
+        resources: {requests: {cpu: 50m, memory: 128Mi}, limits: {memory: 512Mi}}
+        volumeMounts: [{name: media, mountPath: /data/media}]
+      volumes:
+      - name: media
+        hostPath: {path: /var/lib/docker/vtonweb-media, type: DirectoryOrCreate}

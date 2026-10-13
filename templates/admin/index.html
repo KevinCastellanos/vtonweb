@@ -1,0 +1,36 @@
+{% extends "admin/index.html" %}
+{% load static %}
+{% block content %}
+<style>
+ .dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+ .kpi{background:var(--darkened-bg,#f8f8f8);border:1px solid var(--hairline-color,#ddd);border-left:4px solid #1b447f;border-radius:8px;padding:12px 14px}
+ .kpi b{display:block;font-size:26px;color:var(--body-fg)}.kpi span{font-size:12px;color:var(--body-quiet-color)}
+ .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:14px;margin-bottom:18px}
+ .box{border:1px solid var(--hairline-color,#ddd);border-radius:8px;padding:12px;background:var(--body-bg)}
+ .box h3{margin:0 0 8px;font-size:14px}
+</style>
+<div class="dash">{% for label,val,icon in kpis %}<div class="kpi"><b>{{ val }}</b><span>{{ label }}</span></div>{% endfor %}</div>
+<div class="grid2">
+ <div class="box"><h3>Llamadas a la API por día (últimos {{ dash_days }} días)</h3><canvas id="c1" height="150"></canvas></div>
+ <div class="box"><h3>Inicios de sesión y registros por día</h3><canvas id="c2" height="150"></canvas></div>
+ <div class="box"><h3>Frecuencia de uso por hora del día</h3><canvas id="c3" height="150"></canvas></div>
+ <div class="box"><h3>Estado de las solicitudes</h3><div style="max-width:260px;margin:auto"><canvas id="c4"></canvas></div></div>
+</div>
+<div class="grid2">
+ <div class="box"><h3>Usuarios que más usan la API</h3><table style="width:100%"><thead><tr><th>Usuario</th><th>Llamadas</th><th>Última</th></tr></thead><tbody>
+  {% for u in top_users %}<tr><td>{{ u.username }}</td><td>{{ u.n }}</td><td>{{ u.last|date:"d/m H:i" }}</td></tr>{% empty %}<tr><td colspan="3">Sin datos aún</td></tr>{% endfor %}</tbody></table></div>
+ <div class="box"><h3>Últimos eventos</h3><table style="width:100%"><tbody>
+  {% for e in recent_events %}<tr><td>{{ e.created_at|date:"d/m H:i" }}</td><td>{{ e.user|default:"—" }}</td><td>{{ e.get_kind_display }}</td></tr>{% empty %}<tr><td>Sin datos aún</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{{ chart|json_script:"chart-data" }}
+<script src="{% static 'vendor/chart.umd.js' %}"></script>
+<script>
+const D=JSON.parse(document.getElementById('chart-data').textContent);
+const navy='#1b447f',acc='#4f8cff',ok='#2e9e63',bad='#d64545',warn='#e0a030';
+new Chart(c1,{type:'bar',data:{labels:D.days,datasets:[{label:'Llamadas',data:D.jobs,backgroundColor:navy}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+new Chart(c2,{type:'line',data:{labels:D.days,datasets:[{label:'Inicios de sesión',data:D.logins,borderColor:acc,tension:.3},{label:'Registros',data:D.regs,borderColor:ok,tension:.3}]},options:{scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+new Chart(c3,{type:'bar',data:{labels:[...Array(24).keys()].map(h=>h+'h'),datasets:[{label:'Accesos',data:D.hours,backgroundColor:acc}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+new Chart(c4,{type:'doughnut',data:{labels:['Listas','Con error','En cola','Procesando'],datasets:[{data:D.status,backgroundColor:[ok,bad,warn,acc]}]}});
+</script>
+{{ block.super }}
+{% endblock %}
